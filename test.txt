@@ -1,3 +1,7 @@
+CONST INT A_3aZ_1;
+BOOL Tr;
+FLOAT R_4e;
 BEGIN
-
+Tr:=5.5;
+Tr:=5+Rs;
 END
