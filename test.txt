@@ -1,7 +1,29 @@
-CONST INT A_3aZ_1;
-BOOL Tr;
+CONST INT A_3aZ_1=2;
 FLOAT R_4e;
 BEGIN
-Tr:=5.5;
-Tr:=5+Rs;
+A:=true;
+IF(1<5){
+A:=5;
+IF(1<5){}
+ELSE{
+In:=(5+7);}
+I++;
+A:=Rt;
+A:=5+4;
+}
+An:=5;
+
+WHILE(R<2){
+R:=R+2;
+}
+
+FOR(INDEX := 0 , INDEX <= H2, INDEX++) {
+    WHILE(INDEX <= H2){
+        COOL := TRUE;
+    }
+    WHILE(INDEX <= H2){
+        KILL :=K;
+    }
+}
+
 END
