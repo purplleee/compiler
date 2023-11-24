@@ -27,6 +27,7 @@ FOR  {printf("found a \'%s\' \n",yytext); return forr;}
 IF  {printf("found a \'%s\' \n",yytext); return iff;}
 ELSE {printf("found a \'%s\' \n",yytext); return els;}
 WHILE {printf("found a \'%s\' \n",yytext); return whl;}
+DO {printf("found a \'%s\' \n",yytext); return doo;}
 {idf} {printf("Identificateur : %s\n", yytext);   return id;} 
 {number} {printf("found a \'%s\' yay \n",yytext);  return nbr;}
 {nbrin} {printf("found a \'%s\' \n",yytext);  return nbrin;}
