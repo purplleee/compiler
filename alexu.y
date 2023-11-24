@@ -7,7 +7,7 @@ void yyerror(const char *s);
 
 %token bgn end id intgr floatt bl pvg cnst aff add sous mult divi equal
 	 nbr nbrin nbrfl vg oppar clpar opacc clacc sup supeq inf infeq 
-	noequals equals tr fls forr iff els whl
+	noequals equals tr fls forr iff els whl doo
 
 %%
 
@@ -25,17 +25,18 @@ TYPEI: intgr | floatt
 ;
 
 
-INST:  AFF INST | IF_STAT INST | WHILE INST | FOR INST |
+INST:  AFF INST | IF_STAT INST | WHILE INST | FOR INST | DOWHILE INST |
 ;
-
-
 
 INSTBLOC: opacc BLOC clacc
 ;
-BLOC:AFF BLOC | IF_STAT BLOC | WHILE INST | FOR INST |
+BLOC:AFF BLOC | IF_STAT BLOC | WHILE BLOC | FOR BLOC | DOWHILE BLOC |
 ;
 
+
 WHILE: whl COND INSTBLOC
+;
+DOWHILE:doo INSTBLOC whl COND pvg
 ;
 FOR: forr FORIN INSTBLOC
 ;
@@ -48,12 +49,17 @@ INIT:id aff NB
 
 AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF | id aff id pvg AFF | CPTV AFF |
 ;
-EXP_ARITHM: EXP_ARITH1 EXP_ARITHM | EXP_ARITH EXP_ARITHM |
+EXP_ARITHM:oppar EXP_ARITH clpar OP EXP_ARITHM
+	   | oppar EXP_ARITHM clpar OP EXP_ARITHM
+	   | oppar EXP_ARITHM clpar
+	   | oppar EXP_ARITH clpar
+	   | nbr 
+	   | id  
+	   | EXP_ARITH
 ;
 
-EXP_ARITH1: oppar EXP_ARITH clpar EXP_ARITH1 |
-;
-EXP_ARITH:id OP id | nbr OP id | nbr OP nbr | id OP nbr
+EXP_ARITH:id OP id | nbr OP id | nbr OP nbr | id OP nbr 
+	  | EXP_ARITH OP nbr | EXP_ARITH OP id | nbr OP EXP_ARITH | id OP EXP_ARITH
 ;
 OP: add | sous | mult | divi
 ;
