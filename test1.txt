@@ -1,0 +1,25 @@
+CONST INT H1 = 5;
+INT H2, INDEX;
+BOOL A;
+
+BEGIN 
+A := A<1;
+H2 := H1 - 5; 
+FOR(INDEX := 0 , INDEX <= H2, INDEX := INDEX + 1) {
+    WHILE(INDEX <= H2){
+        COOL := true;
+    }
+    DO{
+        KILL := ((5*6)/9+3)-K;
+        WHILE(INDEX <= H2){
+        COOL := true;
+        }
+    }WHILE(INDEX <= H2);
+    H2 := H2 + 1;
+    IF(A == false) {
+        A := true;
+    } ELSE {
+        A := false;
+    }
+}
+END

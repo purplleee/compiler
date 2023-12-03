@@ -36,7 +36,7 @@ R:=R+2;
 
 FOR(INDEX := 0 , INDEX <= H2, INDEX++) {
     WHILE(INDEX <= H2){
-        COOL := TRUE;
+        COOL := true;
     }
     WHILE(INDEX <= H2){
         KILL :=K;
