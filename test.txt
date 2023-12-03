@@ -1,17 +1,34 @@
 CONST INT A_3aZ_1=2;
 FLOAT R_4e;
+INT X2_b;
 BEGIN
 A:=true;
 IF(1<5){
 A:=5;
 IF(1<5){}
 ELSE{
-In:=(5+7);}
+In:=(5+7)+5;}
 I++;
 A:=Rt;
-A:=5+4;
+A:=5+4+5;
 }
 An:=5;
+
+X2_b:=2;
+SWITCH (X2_b+10) {
+    CASE 1:
+            X:=111;
+            BREAK;
+    CASE 2:
+            X:=13;
+            BREAK;
+    CASE 3:
+            X:=12;
+            BREAK;
+    DEFAULT:
+            X:=7;
+            BREAK;
+}
 
 WHILE(R<2){
 R:=R+2;
