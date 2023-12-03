@@ -64,7 +64,8 @@ FORIN: oppar INIT vg CONDI vg CPT clpar
 INIT: id aff NB
 ;
 
-AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF | id aff id pvg AFF | CPTV AFF |
+AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF 
+    | id aff id pvg AFF | CPTV AFF | id aff EXP_LOG pvg AFF |
 ;
 AFFNB: BOOLEAN | NB
 ;
@@ -92,7 +93,7 @@ COND: oppar CONDI clpar
 ;
 CONDI: EXP_LOG | BOOLEAN | id 
 ;
-EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB
+EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB | id OPL BOOLEAN 
 ;
 OPL: sup | supeq | inf | infeq | noequals | equals
 ;
