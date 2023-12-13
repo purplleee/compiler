@@ -20,6 +20,7 @@ nbrfl [-]?[0-9]+[.][0-9]+
 nbrin [-]?[0-9]+
 comment \/\/[^\n]*
 idf {maj}[_]?(?:{letnmb}+(?:_{letnmb}+)*)?
+bol true|false
 
 %%
 BEGIN {printf("look a  \'%s\' \n",yytext);nb_col += yyleng;  return bgn;}
@@ -72,6 +73,8 @@ false  {printf("look a \'%s\' \n",yytext);
         nb_col += strlen(yytext);
          return fls;
 }
+
+{bol}  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bol;}
 
 {comment} {/*ignor*/}
 
