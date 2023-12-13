@@ -20,7 +20,7 @@ void yyerror(const char *s);
 
 %token bgn end <str>id intgr floatt bl pvg cnst aff add sous mult divi equal
     <integer>nbrin <real>nbrfl vg oppar clpar opacc clacc sup supeq inf infeq 
-    noequals equals tr fls forr iff els whl doo err swtch cas pp dflt bk
+    noequals equals bol forr iff els whl doo err swtch cas pp dflt bk
 
 %%
 
@@ -106,7 +106,7 @@ EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB
 OPL: sup | supeq | inf | infeq | noequals | equals
 ;
 
-BOOLEAN: tr | fls
+BOOLEAN: bol
 ;
 CPT: id add add  | id sous sous  | add add id  | sous sous id  
     | id aff id add NB | id aff id sous NB
