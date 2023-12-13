@@ -1,5 +1,6 @@
 %{
 #include "alexu.tab.h"
+#include "c_funct.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -10,58 +11,6 @@ extern bool col;
 extern YYSTYPE yylval;
 extern void colonnes(int *value,bool* test);
 
-
-//Structure de la table des symboles
-typedef struct {
-char NomEntite[20];
-char CodeEntite[20];
-} TypeTS;
-
-//Initialisation du tableau contenant les elements de la table des symboles
-TypeTS ts[300];
-
-//Compteur pour le parcours de la TS
-int CpTabSym=0;
-
-//Definition d'une fonction recherche
-//La position i si symbole existe -1 sinon
-int recherche(char entite[]) {
-    int i = 0;
-    while (i < CpTabSym) {
-        if (strcmp(entite, ts[i].NomEntite) == 0) {
-            return i;
-        }
-        i++;
-    }
-    return -1;
-}
-
-
-//Definition d'une fonction pour inserer les symboles dans la TS
-void inserer(char entite[], char code[]) {
-    if (recherche(entite) == -1) {
-        strcpy(ts[CpTabSym].NomEntite, entite);
-        strcpy(ts[CpTabSym].CodeEntite, code);
-        CpTabSym++;
-    }
-}
-
-
-// Definition d'une fonction pour afficher la TS
-void afficher() {
-    printf("\n/***************Table des symboles ******************/\n");
-    printf("________________________\n");
-    printf("\t| NomEntite | CodeEntite \n");
-    printf("________________________\n");
-    int i = 0;
-    while (i < CpTabSym) {
-        printf("\t|%10s |%12s |\n", ts[i].NomEntite, ts[i].CodeEntite);
-        i++;
-    }
-}
-
-
-
 %}
 
 maj [A-Z]
@@ -69,6 +18,7 @@ lettre [A-Za-z]
 letnmb [a-zA-Z0-9]
 nbrfl [-]?[0-9]+[.][0-9]+
 nbrin [-]?[0-9]+
+comment \/\/[^\n]*
 idf {maj}[_]?(?:{letnmb}+(?:_{letnmb}+)*)?
 
 %%
@@ -97,12 +47,33 @@ BREAK {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bk;}
 }
 
 
+{nbrin} {printf("look a \'%s\' hey \n",yytext);
+        nb_col += strlen(yytext);
+        yylval.integer=atoi(yytext);
+        yylval.str=strdup("Integer");
+        return nbrin;
+}
 
-{nbrin} {printf("look a \'%s\' hey \n",yytext);nb_col += strlen(yytext); yylval.integer=atoi(yytext); return nbrin;}
+
+{nbrfl} {printf("look a \'%s\' yay \n",yytext);
+         nb_col += strlen(yytext);
+         yylval.real=atoi(yytext);
+         yylval.str=strdup("Float");
+         return nbrfl;
+}
 
 
-{nbrfl} {printf("look a \'%s\' yay \n",yytext);nb_col += strlen(yytext); yylval.real=atoi(yytext); return nbrfl;}
+true  {printf("look a \'%s\' \n",yytext);
+       nb_col += strlen(yytext);
+       return tr;
+}
 
+false  {printf("look a \'%s\' \n",yytext);
+        nb_col += strlen(yytext);
+         return fls;
+}
+
+{comment} {/*ignor*/}
 
 := {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return aff;}
 \+ {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return add;}
@@ -123,8 +94,7 @@ BREAK {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bk;}
 ; {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return pvg;}
 , {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return vg;}
 : {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return pp;}
-true  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return tr;}
-false  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return fls;}
+
 [ \t] { nb_col += yyleng; /* Ignore les espaces et les tabulations */}
 \n {nb_ligne++;col=true;colonnes(&nb_col,&col);}
 . {printf("lexical error : the character \'%c\' is unknown at line : %d and column : %d \n",yytext[0],nb_ligne,nb_col);return err;}

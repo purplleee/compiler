@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 extern void afficher();
 int yylex();
 int nb_ligne = 1;
 int nb_col = 1;
 bool col = false;
+char saveType [20];  // variable pour sauvegarder les types
 void yyerror(const char *s);
 %}
 
@@ -31,9 +33,16 @@ NDEC: vg id NDEC |
 ;
 CONSTANTE: cnst TYPEI id equal NB pvg  
 ;
-TYPE: intgr | floatt | bl
+
+
+TYPE: intgr {saveType=strdup($1)} | 
+      floatt {saveType=strdup($1)} |
+      bl
 ;
-TYPEI: intgr | floatt  
+
+
+TYPEI: intgr | 
+       floatt  
 ;
 
 
@@ -64,8 +73,7 @@ FORIN: oppar INIT vg CONDI vg CPT clpar
 INIT: id aff NB
 ;
 
-AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF 
-    | id aff id pvg AFF | CPTV AFF | id aff EXP_LOG pvg AFF |
+AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF | id aff id pvg AFF | CPTV AFF |
 ;
 AFFNB: BOOLEAN | NB
 ;
@@ -93,7 +101,7 @@ COND: oppar CONDI clpar
 ;
 CONDI: EXP_LOG | BOOLEAN | id 
 ;
-EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB | id OPL BOOLEAN 
+EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB
 ;
 OPL: sup | supeq | inf | infeq | noequals | equals
 ;
