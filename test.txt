@@ -1,16 +1,18 @@
 CONST INT A_3aZ_1=2;
 FLOAT R_4e;
-INT X2_b;
+BOOL A,Rt,COOL,KILL,k;
+INT A1,In,I,An,X2_b,X,R,H2,INDEX;
+
 BEGIN
 A:=true;
 IF(1<5){
-A:=5;
+A1:=5;
 IF(1<5){}
 ELSE{
 In:=(5+7)+5;}
 I++;
 A:=Rt;
-A:=5+4+5;
+A1:=5+4+5;
 }
 An:=5;
 
