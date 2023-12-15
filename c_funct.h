@@ -1,4 +1,3 @@
-
 //Structure de la table des symboles
 typedef struct {
 char NomEntite[20];
@@ -37,7 +36,7 @@ void inserer(char entite[], char code[]) {
 
 
 //Definition d'une fonction pour inserer le types des symboles dans la TS
-void insererType(char entite[], type code[]) {
+void insererType(char entite[], char type[]) {
     int pos;
     pos = recherche(entite);
     if (pos != -1)
@@ -47,15 +46,15 @@ void insererType(char entite[], type code[]) {
 
 // Definition d'une fonction pour afficher la TS
 void afficher() {
-    printf("\n/***************Table des symboles ******************/\n");
-    printf("_____________________________________________\n");
-    printf("\t| Nom | Code | Type \n");
-    printf("_____________________________________________\n");
-    int i = 0;
-    while (i < CpTabSym) {
-        printf("\t|%10s |%12s |%12s \n", ts[i].NomEntite, ts[i].CodeEntite, ts[i].TypeEntite);
-        i++;
+    printf("________________________________________________________\n");
+    printf("\n                   Table des symboles                 \n");
+    printf("________________________________________________________\n");
+    printf("\t|     Nom     |     Code    |     Type    |\n");
+    printf("________________________________________________________\n");
+
+    int index = 0;
+    while (index < CpTabSym) {
+        printf("\t|%12s |%12s |%12s |\n", ts[index].NomEntite, ts[index].CodeEntite, ts[index].TypeEntite);
+        index++;
     }
 }
-
-
