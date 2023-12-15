@@ -10,7 +10,6 @@ extern int nb_col;
 extern bool col;
 extern YYSTYPE yylval;
 extern void colonnes(int *value,bool* test);
-
 %}
 
 maj [A-Z]
@@ -25,12 +24,10 @@ bol true|false
 %%
 BEGIN {printf("look a  \'%s\' \n",yytext);nb_col += yyleng;  return bgn;}
 END {printf("look a  \'%s\' \n",yytext);nb_col += strlen(yytext);  return end;}
-INT {printf("look a  \'%s\' \n",yytext);nb_col += strlen(yytext); return intgr;}
-FLOAT {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return floatt;}
-BOOL {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bl;}
 CONST {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return cnst;}
 FOR  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return forr;}
 IF  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return iff;}
+ELIF  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return elif;}
 ELSE {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return els;}
 WHILE {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return whl;}
 DO {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return doo;}
@@ -39,42 +36,54 @@ CASE {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return cas;}
 DEFAULT {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return dflt;}
 BREAK {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bk;}
 
-{idf} {printf("Idf : %s\n", yytext);nb_col += yyleng;
-		if(yyleng<=10) {
-            yylval.str=strdup(yytext);
-            inserer(yytext,"id");
-            return id;}
-		else printf("lexical error at line : %d and column : %d \nthe idf :%s is too long ,his length is %d and its superior than 10\n",nb_ligne,nb_col,yytext,yyleng);     
+INT {printf("look a  \'%s\' \n",yytext);
+     nb_col += strlen(yytext);
+     yylval.str=strdup("Int");
+     //strcpy(saveType,"Int");
+     return intgr;
+}
+
+FLOAT {printf("look a \'%s\' \n",yytext);
+       nb_col += strlen(yytext);
+       yylval.str=strdup("Float");
+       //strcpy(saveType,"Float");
+       return floatt;
+}
+
+BOOL {printf("look a \'%s\' \n",yytext);
+      nb_col += strlen(yytext);
+      yylval.str=strdup("Bool");
+      //strcpy(saveType,"Bool");
+      return bl;
+}
+
+{idf} {printf("Idf : %s\n", yytext);
+       nb_col += yyleng;
+       if(yyleng<=10) {
+         inserer(yytext,"id");
+         yylval.str=strdup(yytext);
+         return id;}
+       else printf("lexical error at line : %d and column : %d \nthe idf :%s is too long ,his length is %d and its superior than 10\n",nb_ligne,nb_col,yytext,yyleng);     
 }
 
 
 {nbrin} {printf("look a \'%s\' hey \n",yytext);
         nb_col += strlen(yytext);
         yylval.integer=atoi(yytext);
-        yylval.str=strdup("Integer");
         return nbrin;
 }
 
 
 {nbrfl} {printf("look a \'%s\' yay \n",yytext);
          nb_col += strlen(yytext);
-         yylval.real=atoi(yytext);
-         yylval.str=strdup("Float");
+         yylval.real=atof(yytext);
          return nbrfl;
 }
 
-
-true  {printf("look a \'%s\' \n",yytext);
-       nb_col += strlen(yytext);
-       return tr;
+{bol} {printf("look a \'%s\' \n",yytext);
+            nb_col += strlen(yytext);
+            return bol;
 }
-
-false  {printf("look a \'%s\' \n",yytext);
-        nb_col += strlen(yytext);
-         return fls;
-}
-
-{bol}  {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bol;}
 
 {comment} {/*ignor*/}
 

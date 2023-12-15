@@ -4,11 +4,12 @@
 #include <stdbool.h>
 #include <string.h>
 extern void afficher();
+extern void insererType(char entite[], char type[]);
+char saveType[20];
 int yylex();
 int nb_ligne = 1;
 int nb_col = 1;
 bool col = false;
-char saveType [20];  // variable pour sauvegarder les types
 void yyerror(const char *s);
 %}
 
@@ -18,37 +19,40 @@ void yyerror(const char *s);
     char* str;
 }
 
-%token bgn end <str>id intgr floatt bl pvg cnst aff add sous mult divi equal
-    <integer>nbrin <real>nbrfl vg oppar clpar opacc clacc sup supeq inf infeq 
-    noequals equals bol forr iff els whl doo err swtch cas pp dflt bk
+%token bgn end <str>id <str>intgr <str>floatt <str>bl pvg cnst aff add sous mult divi equal
+       <integer>nbrin <real>nbrfl vg oppar clpar opacc clacc sup supeq inf infeq 
+       noequals equals bol forr iff elif els whl doo err swtch cas pp dflt bk
+
 
 %%
 
 S: DEC bgn INST end { printf("syntaxe correcte\n"); YYACCEPT; }
 ;
 
-DEC: TYPE id NDEC pvg DEC | CONSTANTE DEC | 
-;
-NDEC: vg id NDEC |
-;
-CONSTANTE: cnst TYPEI id equal NB pvg  
+DEC: DEC DECL | DECL
 ;
 
-
-TYPE: intgr {saveType=strdup($1)} | 
-      floatt {saveType=strdup($1)} |
-      bl
+DECL: TYPE IDLIST pvg | CONSTANTE 
+;
+IDLIST: IDLIST vg id {insererType($3, saveType);}
+       | id {insererType($1, saveType);}
+;
+CONSTANTE: cnst TYPEI id equal NB pvg  {insererType($3, saveType);}
+;
+TYPE: intgr { strcpy(saveType, yylval.str); } 
+     | floatt { strcpy(saveType, yylval.str); } 
+     | bl { strcpy(saveType, yylval.str); }
 ;
 
-
-TYPEI: intgr | 
-       floatt  
+TYPEI: intgr { strcpy(saveType, yylval.str); } 
+     | floatt { strcpy(saveType, yylval.str); } 
 ;
+
 
 
 INST: AFF INST | IF_STAT INST | WHILE INST | FOR INST | DOWHILE INST | SWITCH_STAT INST |
 ;
-INSTBLOC: opacc BLOC clacc
+INSTBLOC: opacc BLOC clacc 
 ;
 BLOC: AFF BLOC | IF_STAT BLOC | WHILE BLOC | FOR BLOC | DOWHILE BLOC | SWITCH_STAT BLOC | 
 ;
@@ -62,7 +66,7 @@ SWITCH_STAT: swtch oppar SWTHCOND clpar opacc CASES clacc
 ;
 CASES: cas SWTHCOND pp INST bk pvg CASES | dflt pp INST bk pvg | 
 ;
-SWTHCOND: EXP_ARITHM | nbrin | oppar nbrin clpar
+SWTHCOND: EXP_ARITHM | nbrin 
 ;
 
 
@@ -70,52 +74,60 @@ FOR: forr FORIN INSTBLOC
 ;
 FORIN: oppar INIT vg CONDI vg CPT clpar
 ;
-INIT: id aff NB
+INIT: id aff IDNB
 ;
 
-AFF: id aff EXP_ARITHM pvg AFF | id aff AFFNB pvg AFF | id aff id pvg AFF | CPTV AFF |
+AFF: id aff AFFN pvg | CPTV 
 ;
-AFFNB: BOOLEAN | NB
+AFFN: bol | NB | EXP_ARITHM | id | EXP_LOG
 ;
-EXP_ARITHM: oppar EXP_ARITH clpar OP EXP_ARITHM
-       |    oppar EXP_ARITHM clpar OP EXP_ARITHM
-       |    oppar EXP_ARITHM clpar
-       |    oppar EXP_ARITH clpar
-       |    NB
-       |    id  
-       |    EXP_ARITH
+EXP_ARITHM:  EXP_ARITH EXP_ARITHM | EXOP
 ;
-EXP_ARITH: id OP id | NB OP id | NB OP NB | id OP NB 
-      | EXP_ARITH OP NB | EXP_ARITH OP id | NB OP EXP_ARITH | id OP EXP_ARITH
+EXOP:OP EXP_ID_NB |
+;
+
+EXP_ARITH: EXP_ID_NB OP EXP_ID_NB | oppar EXP_ARITH clpar
+;
+EXP_ID_NB: EXP_ARITH | id | NB 
 ;
 OP: add | sous | mult | divi
 ;
 
-IF_STAT: IF ELSE | IF 
+IF_STAT: IF ELSE
 ;
-IF: iff COND INSTBLOC
+IF: iff COND INSTBLOC ELIF
 ;
-ELSE: els INSTBLOC
+ELIF: elif COND INSTBLOC ELIF |
+;
+ELSE: els INSTBLOC |
 ;
 COND: oppar CONDI clpar 
 ;
-CONDI: EXP_LOG | BOOLEAN | id 
+CONDI: EXP_LOG | bol | id 
 ;
-EXP_LOG: id OPL id | NB OPL id | NB OPL NB | id OPL NB
+EXP_LOG: BID OPL BID 
 ;
 OPL: sup | supeq | inf | infeq | noequals | equals
 ;
 
-BOOLEAN: bol
+BID: id | NB | bol | EXP_ARITHM
 ;
-CPT: id add add  | id sous sous  | add add id  | sous sous id  
-    | id aff id add NB | id aff id sous NB
+CPT: id CPPT | ADSO id 
+;
+CPPT: ADSO | aff EXP_ARITHM
 ;
 CPTV: CPT pvg
 ;
 
-NB: nbrin | nbrfl | oppar nbrin clpar | oppar nbrfl clpar
+
+ADSO: add add | sous sous
 ;
+IDNB: id | NB 
+;
+
+NB: nbrin | nbrfl | oppar NB clpar
+;
+
 
 %%
 
