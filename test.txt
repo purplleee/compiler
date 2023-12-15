@@ -1,19 +1,26 @@
 CONST INT A_3aZ_1=2;
 FLOAT R_4e;
-BOOL A,Rt,COOL,KILL,k;
-INT A1,In,I,An,X2_b,X,R,H2,INDEX;
-
+INT X2_b;
+BOOL M;
 BEGIN
-A:=true;
-IF(1<5){
-A1:=5;
-IF(1<5){}
-ELSE{
-In:=(5+7)+5;}
-I++;
-A:=Rt;
-A1:=5+4+5;
-}
+  A:=true;
+  IF(1<5){
+  A:=5;
+	IF(1<5){
+        }
+	ELIF(1<7){
+	//hhhhh
+        }
+	ELSE{
+	In:=((5+7)+5);
+	}
+  }
+  Tnn:=(5+7);
+  I++;
+  A:=Rt;
+  A:=5+4+5;
+  I++;
+
 An:=5;
 
 X2_b:=2;
@@ -38,7 +45,7 @@ R:=R+2;
 
 FOR(INDEX := 0 , INDEX <= H2, INDEX++) {
     WHILE(INDEX <= H2){
-        COOL := true;
+        COOL := TRUE;
     }
     WHILE(INDEX <= H2){
         KILL :=K;
