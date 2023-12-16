@@ -4,8 +4,13 @@
 #include <stdbool.h>
 #include <string.h>
 extern void afficher();
+extern int declaration(char entite[]);
 extern void insererType(char entite[], char type[]);
+extern void insererConst(char entite[], char valeur[]);
+extern int constVal(char entite[]);
 char saveType[20];
+char saveConst[20];
+//char tmpVal[20];
 int yylex();
 int nb_ligne = 1;
 int nb_col = 1;
@@ -34,18 +39,28 @@ DEC: DEC DECL | DECL
 
 DECL: TYPE IDLIST pvg | CONSTANTE 
 ;
-IDLIST: IDLIST vg id {insererType($3, saveType);}
-       | id {insererType($1, saveType);}
+IDLIST: IDLIST vg id { if (declaration($3) == 0) 
+                          insererType($3, saveType);
+                       else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col); }
+
+       | id { if (declaration($1) == 0) 
+                insererType($1, saveType);
+              else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$1,nb_ligne,nb_col); }
 ;
-CONSTANTE: cnst TYPEI id equal NB pvg  {insererType($3, saveType);}
-;
-TYPE: intgr { strcpy(saveType, yylval.str); } 
-     | floatt { strcpy(saveType, yylval.str); } 
-     | bl { strcpy(saveType, yylval.str); }
+CONSTANTE: cnst TYPEI id equal NB pvg  { if (declaration($3) == 0) 
+                                          insererType($3, saveType);
+                                         else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col);
+                                         insererConst($3,saveConst);
+;                                       }
+
+
+TYPE: intgr { strcpy(saveType, $1); } 
+     | floatt { strcpy(saveType, $1); } 
+     | bl { strcpy(saveType, $1); }
 ;
 
-TYPEI: intgr { strcpy(saveType, yylval.str); } 
-     | floatt { strcpy(saveType, yylval.str); } 
+TYPEI: intgr { strcpy(saveType, $1); } 
+     | floatt { strcpy(saveType, $1); } 
 ;
 
 
@@ -77,9 +92,15 @@ FORIN: oppar INIT vg CONDI vg CPT clpar
 INIT: id aff IDNB
 ;
 
-AFF: id aff AFFN pvg | CPTV 
+AFF: id aff AFFN pvg { if (declaration($1) == 0) printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);
+                       if (constVal($1) == 1) printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);
+                     }
+| CPTV 
 ;
-AFFN: bol | NB | EXP_ARITHM | id | EXP_LOG
+AFFN: bol | NB | EXP_ARITHM | id { if (declaration($1) == 0)  printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);
+                                   if (constVal($1) == 1) printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);
+                                 } 
+| EXP_LOG
 ;
 EXP_ARITHM:  EXP_ARITH EXP_ARITHM | EXOP
 ;
@@ -125,7 +146,7 @@ ADSO: add add | sous sous
 IDNB: id | NB 
 ;
 
-NB: nbrin | nbrfl | oppar NB clpar
+NB: nbrin { sprintf(saveConst, "%d", $1); } | nbrfl { sprintf(saveConst, "%f", $1); } | oppar NB clpar
 ;
 
 

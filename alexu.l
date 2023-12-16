@@ -39,21 +39,18 @@ BREAK {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return bk;}
 INT {printf("look a  \'%s\' \n",yytext);
      nb_col += strlen(yytext);
      yylval.str=strdup("Int");
-     //strcpy(saveType,"Int");
      return intgr;
 }
 
 FLOAT {printf("look a \'%s\' \n",yytext);
        nb_col += strlen(yytext);
        yylval.str=strdup("Float");
-       //strcpy(saveType,"Float");
        return floatt;
 }
 
 BOOL {printf("look a \'%s\' \n",yytext);
       nb_col += strlen(yytext);
       yylval.str=strdup("Bool");
-      //strcpy(saveType,"Bool");
       return bl;
 }
 
