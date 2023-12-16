@@ -2,6 +2,8 @@ CONST INT A_3aZ_1=2;
 FLOAT R_4e;
 INT X2_b;
 BOOL M;
+FLOAT R_4e;
+
 BEGIN
   A:=true;
   IF(1<5){

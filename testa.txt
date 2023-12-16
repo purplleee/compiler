@@ -2,11 +2,11 @@ CONST INT H1 = 5;
 CONST FLOAT K = 12;
 INT H2, H3, INDEX;
 FLOAT AAb;
-FLOAT AAb;
-BOOL A, COOL, KILL;
+BOOL A;
 
 BEGIN 
-A := false;
+H1 := 10;
+Karl := false;
 H2 := H1 - 5; 
 FOR(INDEX := 0 , INDEX <= H2, INDEX := INDEX + 1) {
     WHILE(INDEX <= H2){
@@ -20,13 +20,6 @@ FOR(INDEX := 0 , INDEX <= H2, INDEX := INDEX + 1) {
     }WHILE(INDEX <= H2);
     H2 := H2 + 1;
     IF(A == false ) {
-        A := true;
-    }
-    ELIF(A == false ) {
-        A := true;
-    }    ELIF(B == false ) {
-        A := true;
-    }    ELIF(Y == false ) {
         A := true;
     } ELSE {
         A := false;
