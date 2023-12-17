@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 extern int nb_ligne;
 extern int nb_col;
 extern bool col;
@@ -78,6 +79,7 @@ BOOL {printf("look a \'%s\' \n",yytext);
 }
 
 {bol} {printf("look a \'%s\' \n",yytext);
+            yylval.str=strdup(yytext);
             nb_col += strlen(yytext);
             return bol;
 }
@@ -85,10 +87,10 @@ BOOL {printf("look a \'%s\' \n",yytext);
 {comment} {/*ignor*/}
 
 := {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return aff;}
-\+ {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return add;}
-\- {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return sous;}
-\* {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return mult;}
-\/ {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return divi;}
+\+ {      yylval.str=strdup("+");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return add;}
+\- {      yylval.str=strdup("-");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return sous;}
+\* {      yylval.str=strdup("*");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return mult;}
+\/ {      yylval.str=strdup("/");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return divi;}
 \< {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return inf;}
 "<=" {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return infeq;}
 \> {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return sup;}

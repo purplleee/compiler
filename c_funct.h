@@ -1,3 +1,4 @@
+#include <ctype.h>
 //Structure de la table des symboles
 typedef struct {
 char NomEntite[20];
@@ -38,12 +39,21 @@ void inserer(char entite[], char code[]) {
 }
 
 
+
 //Definition d'une fonction pour inserer le types des symboles dans la TS
 void insererType(char entite[], char type[]) {
     int pos;
     pos = recherche(entite);
     if (pos != -1)
     strcpy(ts[pos].TypeEntite, type);
+}
+
+//Definition d'une fonction pour inserer la valeur des idf dans la TS
+void insererVal(char entite[], char val[]) {
+    int pos;
+    pos = recherche(entite);
+    strcpy(ts[pos].Valeur, val);
+
 }
 
 
@@ -70,9 +80,34 @@ int declaration(char entite[]) {
      else return -1;
 }
 
+// Definition d'une fonction pour detecter les types
+int dectype(char entite[]) {
+    int pos;
+    pos = recherche(entite);
+    if (strcmp(ts[pos].TypeEntite,"Int") == 0) return 1;
+    if (strcmp(ts[pos].TypeEntite,"Float") == 0) return 2;
+    if (strcmp(ts[pos].TypeEntite,"Bool") == 0) return 3;
+     else return -1;
+}
+
+// Definition d'une fonction pour tester si la valeur est booleenne 
+int Booltest(char val[]) {
+    if (strcmp(val,"true") == 0) return 0;
+    else if (strcmp(val,"false") == 0) return 0;
+     else return -1;
+}
+
+// Definition d'une fonction pour tester si la valeur est integer 
+int INTtest(char val[]) {
+    if ( isdigit(val) ) return 0;
+     else return -1;
+}
+
 // Definition d'une fonction pour determiner si constante ou non et sa valeur
 void insererConst(char entite[], char valeur[]) {
     int pos;
+    float number = atof(valeur);
+    sprintf(valeur, "%.2f", number);
     pos = recherche(entite);
     strcpy(ts[pos].Constante, "oui");
     strcpy(ts[pos].Valeur,valeur);

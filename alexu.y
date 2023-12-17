@@ -3,14 +3,19 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 extern void afficher();
 extern int declaration(char entite[]);
 extern void insererType(char entite[], char type[]);
 extern void insererConst(char entite[], char valeur[]);
+extern void insererVal(char entite[], char val[]);
 extern int constVal(char entite[]);
+extern int dectype(char entite[]);
+extern int Booltest(char val[]);
+extern int INTtest(char val[]);
 char saveType[20];
 char saveConst[20];
-//char tmpVal[20];
+char Val[20];
 int yylex();
 int nb_ligne = 1;
 int nb_col = 1;
@@ -24,9 +29,11 @@ void yyerror(const char *s);
     char* str;
 }
 
-%token bgn end <str>id <str>intgr <str>floatt <str>bl pvg cnst aff add sous mult divi equal
+%type <str>OP
+
+%token bgn end <str>id <str>intgr <str>floatt <str>bl pvg cnst aff <str>add <str>sous <str>mult <str>divi equal
        <integer>nbrin <real>nbrfl vg oppar clpar opacc clacc sup supeq inf infeq 
-       noequals equals bol forr iff elif els whl doo err swtch cas pp dflt bk
+       noequals equals <str>bol forr iff elif els whl doo err swtch cas pp dflt bk
 
 
 %%
@@ -47,13 +54,12 @@ IDLIST: IDLIST vg id { if (declaration($3) == 0)
                 insererType($1, saveType);
               else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$1,nb_ligne,nb_col); }
 ;
-CONSTANTE: cnst TYPEI id equal NB pvg  { if (declaration($3) == 0) 
-                                          insererType($3, saveType);
-                                         else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col);
+CONSTANTE: cnst TYPEI id equal NB pvg  { if (declaration($3) == 0) insererType($3, saveType);
+                                         else {printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col);return err;}
                                          insererConst($3,saveConst);
-;                                       }
+                                      }
 
-
+;
 TYPE: intgr { strcpy(saveType, $1); } 
      | floatt { strcpy(saveType, $1); } 
      | bl { strcpy(saveType, $1); }
@@ -89,34 +95,57 @@ FOR: forr FORIN INSTBLOC
 ;
 FORIN: oppar INIT vg CONDI vg CPT clpar
 ;
-INIT: id aff IDNB
+INIT: id aff IDNB {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+                        if (constVal($1) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+                     }
 ;
 
-AFF: id aff AFFN pvg { if (declaration($1) == 0) printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);
-                       if (constVal($1) == 1) printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);
-                     }
-| CPTV 
+AFF: id aff AFFN pvg {  
+            if (constVal($1) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+            insererVal($1, saveConst);
+			if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+                     
+
+			/*else if ( declaration($1) == 1 && INTtest(Val)== -1 ){
+			 printf("semantic error: %s uncompatible type line : %d and column : %d\n",$1,nb_ligne,nb_col);
+			return err;}*/
+
+			else  if (dectype($1) == 3){ insererVal($1, Val);
+				if( Booltest(Val)== -1 ){
+			printf("semantic error: %s uncompatible type line : %d and column : %d\n",$1,nb_ligne,nb_col);
+			return err;}}
+	                     
+			}
+	| CPTV 
 ;
-AFFN: bol | NB | EXP_ARITHM | id { if (declaration($1) == 0)  printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);
-                                   if (constVal($1) == 1) printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);
-                                 } 
-| EXP_LOG
+AFFN: bol { strcpy(Val, $1);}
+	| NB 
+	| EXP_ARITHM 
+	| EXP_LOG 
+	| id {  if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
+		
 ;
 EXP_ARITHM:  EXP_ARITH EXP_ARITHM | EXOP
 ;
 EXOP:OP EXP_ID_NB |
 ;
 
-EXP_ARITH: EXP_ID_NB OP EXP_ID_NB | oppar EXP_ARITH clpar
+EXP_ARITH: oppar EXP_ARITH clpar | EXP_ID_NB OP EXP_ID_NB {  if((strcmp($2,"/")==0)&&(saveConst==0)){ 
+							  printf("semantic error: divion by 0 line : %d and column : %d\n",nb_ligne,nb_col);
+							  return err; }  }
 ;
-EXP_ID_NB: EXP_ARITH | id | NB 
+EXP_ID_NB: EXP_ARITH | id {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
+	  | NB 
 ;
-OP: add | sous | mult | divi
+OP: add { strcpy($$, $1);}
+   | sous { strcpy($$, $1);}
+   | mult { strcpy($$, $1);}
+   | divi { strcpy($$, $1);} 
 ;
 
-IF_STAT: IF ELSE
+IF_STAT: IF ELIF ELSE  
 ;
-IF: iff COND INSTBLOC ELIF
+IF: iff COND INSTBLOC 
 ;
 ELIF: elif COND INSTBLOC ELIF |
 ;
@@ -124,16 +153,22 @@ ELSE: els INSTBLOC |
 ;
 COND: oppar CONDI clpar 
 ;
-CONDI: EXP_LOG | bol | id 
+CONDI: EXP_LOG | bol | id {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
+                           
 ;
 EXP_LOG: BID OPL BID 
 ;
 OPL: sup | supeq | inf | infeq | noequals | equals
 ;
 
-BID: id | NB | bol | EXP_ARITHM
+BID:  NB | bol | EXP_ARITHM | id {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
 ;
-CPT: id CPPT | ADSO id 
+CPT: id CPPT {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+               if (constVal($1) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+               }
+    | ADSO id {if (declaration($2) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$2,nb_ligne,nb_col);return err;}
+               if (constVal($2) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$2,nb_ligne,nb_col);return err;}
+               }
 ;
 CPPT: ADSO | aff EXP_ARITHM
 ;
@@ -143,7 +178,7 @@ CPTV: CPT pvg
 
 ADSO: add add | sous sous
 ;
-IDNB: id | NB 
+IDNB: NB | id {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}} 
 ;
 
 NB: nbrin { sprintf(saveConst, "%d", $1); } | nbrfl { sprintf(saveConst, "%f", $1); } | oppar NB clpar
