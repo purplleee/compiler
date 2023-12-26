@@ -87,10 +87,10 @@ BOOL {printf("look a \'%s\' \n",yytext);
 {comment} {/*ignor*/}
 
 := {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return aff;}
-\+ {      yylval.str=strdup("+");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return add;}
-\- {      yylval.str=strdup("-");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return sous;}
-\* {      yylval.str=strdup("*");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return mult;}
-\/ {      yylval.str=strdup("/");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return divi;}
+\+ {yylval.str=strdup("+");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return add;}
+\- {yylval.str=strdup("-");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return sous;}
+\* {yylval.str=strdup("*");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return mult;}
+\/ {yylval.str=strdup("/");	printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return divi;}
 \< {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return inf;}
 "<=" {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext);  return infeq;}
 \> {printf("look a \'%s\' \n",yytext);nb_col += strlen(yytext); return sup;}

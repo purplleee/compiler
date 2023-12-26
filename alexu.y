@@ -41,18 +41,16 @@ void yyerror(const char *s);
 S: DEC bgn INST end { printf("syntaxe correcte\n"); YYACCEPT; }
 ;
 
-DEC: DEC DECL | DECL
+DEC: DEC DECL | DECL |
 ;
 
 DECL: TYPE IDLIST pvg | CONSTANTE 
 ;
-IDLIST: IDLIST vg id { if (declaration($3) == 0) 
-                          insererType($3, saveType);
-                       else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col); }
+IDLIST: IDLIST vg id { if (declaration($3) == 0) insererType($3, saveType);
+                       else{printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col);return err; }}
 
-       | id { if (declaration($1) == 0) 
-                insererType($1, saveType);
-              else printf("semantic error: double declaration of %s at line : %d and column : %d\n",$1,nb_ligne,nb_col); }
+       | id { if (declaration($1) == 0) insererType($1, saveType);
+              else {printf("semantic error: double declaration of %s at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err; }}
 ;
 CONSTANTE: cnst TYPEI id equal NB pvg  { if (declaration($3) == 0) insererType($3, saveType);
                                          else {printf("semantic error: double declaration of %s at line : %d and column : %d\n",$3,nb_ligne,nb_col);return err;}
@@ -97,6 +95,7 @@ FORIN: oppar INIT vg CONDI vg CPT clpar
 ;
 INIT: id aff IDNB {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
                         if (constVal($1) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
+                     insererVal($1, saveConst);
                      }
 ;
 
@@ -104,40 +103,47 @@ AFF: id aff AFFN pvg {
             if (constVal($1) == 1){ printf("semantic error: %s has already a value : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
             insererVal($1, saveConst);
 			if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}
-                     
 
-			/*else if ( declaration($1) == 1 && INTtest(Val)== -1 ){
-			 printf("semantic error: %s uncompatible type line : %d and column : %d\n",$1,nb_ligne,nb_col);
-			return err;}*/
-
-			else  if (dectype($1) == 3){ insererVal($1, Val);
-				if( Booltest(Val)== -1 ){
+            if (dectype($1) == 3){ 
+			if( Booltest(saveConst)== -1 ){
 			printf("semantic error: %s uncompatible type line : %d and column : %d\n",$1,nb_ligne,nb_col);
+			return err;}}           
+		    if ( dectype($1) == 1  ){
+            if(INTtest(saveConst)== -1){
+            printf("semantic error: %s uncompatible type line : %d and column : %d\n",$1,nb_ligne,nb_col);
 			return err;}}
 	                     
 			}
 	| CPTV 
 ;
-AFFN: bol { strcpy(Val, $1);}
+AFFN: bol { strcpy(saveConst, $1);}
 	| NB 
 	| EXP_ARITHM 
 	| EXP_LOG 
 	| id {  if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
 		
 ;
+
 EXP_ARITHM:  EXP_ARITH EXP_ARITHM | EXOP
 ;
-EXOP:OP EXP_ID_NB |
+
+EXOP:OP EXP_ID_NB { if ((strcmp($1,"/") == 0) && (atof(saveConst) == 0)) {
+                     printf("semantic error: divion by 0 line : %d and column : %d\n",nb_ligne,nb_col);
+                     return err; } } 
+ |
 ;
 
-EXP_ARITH: oppar EXP_ARITH clpar | EXP_ID_NB OP EXP_ID_NB {  if((strcmp($2,"/")==0)&&(saveConst==0)){ 
-							  printf("semantic error: divion by 0 line : %d and column : %d\n",nb_ligne,nb_col);
-							  return err; }  }
+EXP_ARITH: EXP_ID_NB OP EXP_ID_NB { if ((strcmp($2,"/") == 0) && (atof(saveConst) == 0)) {
+                                    printf("semantic error: divion by 0 line : %d and column : %d\n",nb_ligne,nb_col);
+                                    return err; } }
+| oppar EXP_ARITH clpar
 ;
+
+
 EXP_ID_NB: EXP_ARITH | id {if (declaration($1) == 0){ printf("semantic error: %s undeclared at line : %d and column : %d\n",$1,nb_ligne,nb_col);return err;}}
 	  | NB 
 ;
-OP: add { strcpy($$, $1);}
+OP:   add { strcpy($$, $1);}
    | sous { strcpy($$, $1);}
    | mult { strcpy($$, $1);}
    | divi { strcpy($$, $1);} 

@@ -97,10 +97,18 @@ int Booltest(char val[]) {
      else return -1;
 }
 
-// Definition d'une fonction pour tester si la valeur est integer 
+// Definition d'une fonction pour tester si la valeur est un entier
 int INTtest(char val[]) {
-    if ( isdigit(val) ) return 0;
-     else return -1;
+    int i = 0;
+    while (val[i] != '\0') {
+        if (!isdigit(val[i])) {
+            // Le caractère à la position i n'est pas un chiffre
+            return -1;
+        }
+        i++;
+    }
+    // Tous les caractères sont des chiffres, donc c'est un entier
+    return 0;
 }
 
 // Definition d'une fonction pour determiner si constante ou non et sa valeur
